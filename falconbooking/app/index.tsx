@@ -1,15 +1,34 @@
-import { Text, View } from "react-native";
+import React, {useState} from 'react';
+import {Button, Text, View} from 'react-native';
 
-export default function Index() {
+type CatProps = {
+  name: string;
+};
+
+const Cat = (props: CatProps) => {
+  const [isHungry, setIsHungry] = useState(true);
+
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Welcome to FalconBooking.</Text>
+    <View>
+      <Text>
+        I am {props.name}, and I am {isHungry ? 'hungry' : 'full'}!
+      </Text>
+      <Button
+        onPress={() => {
+          setIsHungry(false);
+        }}
+        disabled={!isHungry}
+        title={isHungry ? 'Give me some food, please!' : 'Thank you!'}
+      />
     </View>
   );
-}
+};
+
+export default function HomeScreen() {
+  return (
+    <>
+      <Cat name="Munkustrap" />
+      <Cat name="Spot" />
+    </>
+  );
+};
