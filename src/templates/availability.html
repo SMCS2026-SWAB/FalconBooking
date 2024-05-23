@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex flex-col mt-5 gap-2">
+    <h1 class="font-extrabold text-2xl text-[{{ base['color'] }}]">Select a room</h1>
+    <li>
+        <button id="dropdownDefault" data-dropdown-toggle="dropdown"
+            class="text-gray-300 focus:ring-4 font-semibold rounded-lg text-md px-10 py-2.5 -ml-6 text-center inline-flex items-center border-2 border-gray-300"
+            type="button">{{ (bookings.keys() | list)[room_id] }}<svg class="ml-2 w-4 h-4" aria-hidden="true" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 9l-7 7-7-7"></path>
+            </svg></button>
+        <!-- Dropdown menu -->
+        <div id="dropdown"
+            class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
+            <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
+                {% for name, room in bookings.items() %}
+                <li>
+                    <a href="/availability?id={{ room.id_ }}"
+                       class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">{{ name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </li>
+    <hr class="mt-4 border-1 w-[80vw] border-white/50">
+    <h1 class="font-black text-5xl text-[{{ base['color'] }}] mt-5">{{ (bookings.keys() | list)[room_id] }}</h1>
+    <h1 class="font-light text-lg text-gray-300 -mt-2">Hosts 30 people</h1>
+    <div class="h-[50vh]">
+    {% for window in room_selected.bookings.windowed_period_summary %}
+        <div class="flex flex-row gap-12 h-1/3 p-4">
+        {% for period, is_available in window %}
+            {% if is_available %}
+            <div class="flex flex-col items-start justify-center bg-green-500/[0.025] outline outline-2 outline-green-500/75 rounded-lg p-4 mt-2 w-1/2">
+                <h1 class="font-extrabold text-lg text-white">
+                    {{ period }}
+                </h1>
+                <h1 class="font-light text-sm text-gray-400 -mt-1">
+                    Usually between {{ room_selected.bookings.timings_for_period()[period][0] }} and {{ room_selected.bookings.timings_for_period()[period][1] }}
+                </h1>
+                <button class="bg-[{{ base['color'] }}]/[0.1] outline outline-[{{ base['color'] }}] outline-2 rounded-lg py-2 px-4 mt-3 font-medium text-[{{ base['color'] }}] text-sm hover:bg-[{{ base['color'] }}]/[0.2]">
+                    → Book Room
+                </button>
+            </div>
+            {% else %}
+            <div class="flex flex-col items-start justify-center bg-rose-500/[0.025] outline outline-2 outline-rose-500/75 rounded-lg p-4 mt-2 w-1/2">
+                <h1 class="font-extrabold text-lg text-white">
+                    {{ period }}
+                </h1>
+                <h1 class="font-light text-sm text-gray-400 -mt-1">
+                    Usually between {{ room_selected.bookings.timings_for_period()[period][0] }} and {{ room_selected.bookings.timings_for_period()[period][1] }}
+                </h1>
+                <h1 class="font-semibold text-md text-rose-500 mt-1">
+                    Booked by Shayaan Wadkar
+                </h1>
+            </div>
+            {% endif %}
+        {% endfor %}
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock content %}

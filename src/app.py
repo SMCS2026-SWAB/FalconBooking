@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
-from random import randint
+from random import randint, sample
 
 from flask import Flask, render_template, request
 from humanize import naturaldate
-from utils.booking import Booking
+from utils import Booking, Room
 
 app = Flask(__name__)
 
@@ -20,6 +20,11 @@ def _prefix_of_day(day):
         return "rd"
     else:
         return "th"
+
+
+def get_base_params():
+    """Retrieves and updates the base parameters at the moment."""
+    return {"name": "Shayaan Wadkar", "isLoggedIn": False, "color": "#efae04"}
 
 
 @app.route("/")
@@ -50,18 +55,40 @@ def home():
         availability_by_day=[randint(0, 100) for _ in range(6)],
         bookings=[
             {
-                "SMCS Hub": Booking([]),
-                "Global Hub": Booking(range(9)),
-                "Humanities Hub": Booking([]),
-                "ISP Hub": Booking(range(9))
+                "SMCS Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=1)), 0),
+                "Global Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=3)), 1),
+                "Humanities Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=8)), 2),
+                "ISP Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=5)), 3),
             },
             {
-                "Room 2709": Booking(["a", "b", "c", "d", "e"]),
-                "Room 2800": Booking(range(9)),
-                "Room 2801": Booking(range(9)),
-                "Room 2901": Booking(["a", "b", "c", "d", "e"])
+                "Room 2709": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=4)), 4),
+                "Room 2800": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=2)), 5),
+                "Room 2801": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=7)), 6),
+                "Room 2901": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=5)), 7)
             }
         ]
+    )
+
+
+@app.route("/availability")
+def availability():
+    room_id = int(request.args.get("id", 0))
+    bookings = {
+        "SMCS Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=1)), 0),
+        "Global Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=3)), 1),
+        "Humanities Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=8)), 2),
+        "ISP Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=5)), 3),
+        "Room 2709": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=4)), 4),
+        "Room 2800": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=2)), 5),
+        "Room 2801": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=7)), 6),
+        "Room 2901": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=5)), 7)
+    }
+    return render_template(
+        "availability.html",
+        base=get_base_params(),
+        room_id=room_id,
+        room_selected=next(room for room in bookings.values() if room.id_ == room_id),
+        bookings=bookings
     )
 
 

@@ -7,20 +7,20 @@
     <div class="flex flex-col gap-5">
         {% for row in bookings %}
             <div class="flex flex-row gap-10">
-                {% for room, booking in row.items() %}
+                {% for name, room in row.items() %}
                     <div class="flex flex-col p-8 bg-gray-800 rounded-lg mt-5 w-full">
                         <h2 class="font-extrabold text-xl text-white">
-                            {{ room }}
+                            {{ name }}
                         </h2>
-                        {% if booking.availability == 100 %}
+                        {% if room.bookings.availability == 100 %}
                             <h2 class="font-semibold text-lg text-rose-400">
                                 Booked out
                             </h2>
-                        {% elif booking.availability > 50 %}
+                        {% elif room.bookings.availability > 50 %}
                             <h2 class="font-semibold text-lg text-rose-400">
                                 Mostly booked out
                             </h2>
-                        {% elif booking.availability > 0 %}
+                        {% elif room.bookings.availability > 0 %}
                             <h2 class="font-semibold text-lg text-green-400">
                                 Mostly available
                             </h2>
@@ -29,9 +29,16 @@
                                 Fully available
                             </h2>
                         {% endif %}
-                        <button class="bg-[{{ base['color'] }}] rounded-lg py-2 px-4 mt-4 font-medium text-[#0D1117] text-sm hover:bg-yellow-400">
-                            → Check Availability
-                        </button>
+
+                        {% if room.bookings.availability == 100 %}
+                            <button class="bg-gray-400/[0.1] outline outline-gray-400 outline-2 rounded-lg py-2 px-4 mt-4 font-medium text-gray-400 text-sm hover:bg-gray-400/[0.2]" disabled>
+                                → Check Availability
+                            </button>
+                        {% else %}
+                            <button class="bg-[{{ base['color'] }}]/[0.1] outline outline-[{{ base['color'] }}] outline-2 rounded-lg py-2 px-4 mt-4 font-medium text-[{{ base['color'] }}] text-sm hover:bg-[{{ base['color'] }}]/[0.2]">
+                                <a href="{{ url_for('availability') }}">→ Check Availability</a>
+                            </button>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
@@ -46,12 +53,12 @@
         {% for label, link in days_in_calendar %}
             <div class="flex flex-col items-start justify-start bg-gray-800 rounded-lg p-12 relative">
                 <div class="flex flex-row items-start justify-start absolute top-0 left-0 gap-1.5 mt-2 ml-2">
-                    <div class="w-4 h-4 bg-rose-500{{'' if availability_by_day[loop.index - 1] >= 75 else '/[0.2]'}} rounded-xl"></div>
+                    <div class="w-4 h-4 bg-rose-500{{'' if availability_by_day[loop.index - 1] <= 25 else '/[0.2]'}} rounded-xl"></div>
                     <div class="w-4 h-4 bg-yellow-500{{'' if availability_by_day[loop.index - 1] > 25 and availability_by_day[loop.index - 1] < 75 else '/[0.2]'}} rounded-xl"></div>
-                    <div class="w-4 h-4 bg-green-500{{'' if availability_by_day[loop.index - 1] <= 25 else '/[0.2]'}} rounded-xl"></div>
+                    <div class="w-4 h-4 bg-green-500{{'' if availability_by_day[loop.index - 1] >= 75 else '/[0.2]'}} rounded-xl"></div>
                 </div>
                 <h1 class="font-extrabold text-2xl text-white">{{ label }}</h1>
-                <button class="bg-[{{ base['color'] }}] rounded-lg py-2 px-3 mt-2 font-medium text-[#0D1117] text-sm hover:bg-yellow-400"">
+                <button class="bg-[{{ base['color'] }}]/[0.1] outline outline-[{{ base['color'] }}] outline-2 rounded-lg py-2 px-3 mt-4 font-medium text-[{{ base['color'] }}] text-sm hover:bg-[{{ base['color'] }}]/[0.2]">
                     <a href="/?date={{ link }}">→ Check Bookings</a>
                 </button>
             </div>
