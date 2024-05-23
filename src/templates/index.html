@@ -36,7 +36,7 @@
                             </button>
                         {% else %}
                             <button class="bg-[{{ base['color'] }}]/[0.1] outline outline-[{{ base['color'] }}] outline-2 rounded-lg py-2 px-4 mt-4 font-medium text-[{{ base['color'] }}] text-sm hover:bg-[{{ base['color'] }}]/[0.2]">
-                                <a href="{{ url_for('availability') }}">→ Check Availability</a>
+                                <a href="/availability?id={{ room.id_ }}">→ Check Availability</a>
                             </button>
                         {% endif %}
                     </div>
