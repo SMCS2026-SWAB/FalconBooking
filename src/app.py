@@ -125,6 +125,14 @@ def availability():
         bookings=bookings
     )
 
+@app.route('/login')
+def login():
+    
+    return render_template(
+        "login.html",
+        base=get_base_params(),
+    )
+
 
 @app.route("/confirm_booking")
 def confirm_booking():
