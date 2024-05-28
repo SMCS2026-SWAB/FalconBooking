@@ -12,7 +12,7 @@ load_dotenv()
 class Booking:
     """Represents a single booking made by a teacher for a study room."""
 
-    AVAILABLE_PERIODS = {
+    AVAILABLE_PERIODS = [
         "Period 1",
         "Period 2",
         "Period 3",
@@ -22,7 +22,7 @@ class Booking:
         "Period 7",
         "Period 8",
         "Lunch"
-    }
+    ]
 
     def __init__(self, periods_booked: list, booked_by: dict):
         self.periods_unavailable = sorted(periods_booked)
