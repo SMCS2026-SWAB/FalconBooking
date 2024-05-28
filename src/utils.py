@@ -1,3 +1,10 @@
+from dotenv import load_dotenv
+from os import environ
+from pymongo import MongoClient
+
+load_dotenv()
+
+
 class Booking:
     """Represents a single booking made by a teacher for a study room."""
 
@@ -13,12 +20,12 @@ class Booking:
         "Lunch"
     }
 
-    def __init__(self, periods_free: list):
-        self.periods_free = periods_free
-        self.periods_unavailable = list(self.AVAILABLE_PERIODS.difference(periods_free))
+    def __init__(self, periods_booked: list):
+        self.periods_unavailable = periods_booked
+        self.periods_free = list(self.AVAILABLE_PERIODS.difference(periods_booked))
         self._period_summary = [
-            (period, idx < len(periods_free))
-            for idx, period in enumerate(periods_free + self.periods_unavailable)
+            (period, idx < len(self.periods_free))
+            for idx, period in enumerate(self.periods_free + self.periods_unavailable)
         ]
         self.windowed_period_summary = [self._period_summary[i:i+3] for i in range(0, 9, 3)]
         self.availability = int(
@@ -46,3 +53,5 @@ class Room:
     def __init__(self, booking_list: Booking, id: int):
         self.bookings = booking_list
         self.id_ = id
+
+

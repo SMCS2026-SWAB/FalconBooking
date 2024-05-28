@@ -24,7 +24,7 @@ def _prefix_of_day(day):
 
 def get_base_params():
     """Retrieves and updates the base parameters at the moment."""
-    return {"name": "Shayaan Wadkar", "isLoggedIn": False, "color": "#efae04"}
+    return {"name": "Shayaan Wadkar", "email": "shayaanwadkar@gmail.com", "isLoggedIn": True, "color": "#efae04"}
 
 
 @app.route("/")
