@@ -133,6 +133,14 @@ def login():
         base=get_base_params(),
     )
 
+@app.route('/forgotYourPassword')
+def forgotYourPassword():
+    
+    return render_template(
+        "forgotYourPassword.html",
+        base=get_base_params(),
+    )
+
 
 @app.route("/confirm_booking")
 def confirm_booking():
