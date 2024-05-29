@@ -1,84 +1,63 @@
 <!DOCTYPE html>
-<html>
-<body style="background-color:rgb(25, 25, 25);"></body>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body {font-family: Arial, Helvetica, sans-serif;}
-form {border: 3px solid #ffffff;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="author" content="David Grzyb">
+    <meta name="description" content="">
 
-input[type=text], input[type=password] {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ffcc00;
-  box-sizing: border-box;
-}
-
-button {
-  background-color: #ffe100;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-}
-
-button:hover {
-  opacity: 0.8;
-}
-
-.cancelbtn {
-  width: auto;
-  padding: 10px 18px;
-  background-color: #f2ca00;
-}
-
-.container {
-  padding: 16px;
-}
-
-span.psw {
-  float: right;
-  padding-top: 16px;
-}
-
-/* Change styles for span and cancel button on extra small screens */
-@media screen and (max-width: 300px) {
-  span.psw {
-     display: block;
-     float: none;
-  }
-  .cancelbtn {
-     width: 100%;
-  }
-}
-</style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .body-bg {
+            background-color: #0d1117;
+        }
+    </style>
 </head>
-<body>
+<body class="body-bg min-h-screen pt-12 md:pt-20 pb-6 px-2 md:px-0" style="font-family:'Lato',sans-serif;">
+    <header class="max-w-lg mx-auto">
+        <a href="#">
+            <h1 class="text-4xl font-bold text-center"><span class="text-yellow-600">Falcon</span><span class="text-white">Booking</span></h1>
+        </a>
+    </header>
 
-<h2 style="color:rgb(255, 255, 255);">Login Here</h2>
+    <main class="bg-white max-w-lg mx-auto p-8 md:p-12 my-10 rounded-lg shadow-2xl">
+        <section>
+            <h3 class="font-bold text-2xl">Welcome to Startup</h3>
+            <p class="text-gray-600 pt-2">Log into your account.</p>
+        </section>
 
-<form action="/action_page.php" method="post">
+        <section class="mt-10">
+            <form class="flex flex-col" method="POST" action="#">
+                <div class="mb-6 pt-3 rounded bg-gray-200">
+                    <label class="block text-gray-700 text-sm font-bold mb-2 ml-3" for="email">Email</label>
+                    <input type="text" id="email" class="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-yellow-600 transition duration-500 px-3 pb-3">
+                </div>
+                <div class="mb-6 pt-3 rounded bg-gray-200">
+                    <label class="block text-gray-700 text-sm font-bold mb-2 ml-3" for="password">Password</label>
+                    <input type="password" id="password" class="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-yellow-600 transition duration-500 px-3 pb-3">
+                </div>
+                <div class="flex items-center justify-between mb-6">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="form-checkbox text-yellow-600">
+                        <span class="ml-2 text-gray-700">Remember me</span>
+                    </label>
+                    <a href="#" class="text-sm text-yellow-600 hover:text-yellow-700 hover:underline">Forgot your password?</a>
+                </div>
+                <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200" type="submit">Login</button>
+            </form>
+        </section>
+    </main>
 
-  <div class="container">
-    <label for="uname"><b style="color:rgb(255, 255, 255);">Username</b></label>
-    <input type="text" placeholder="Enter Username" name="uname" required>
+    <div class="max-w-lg mx-auto text-center mt-12 mb-6">
+        <p class="text-white">Don't have an account? <a href="#" class="font-bold hover:underline">Sign up</a>.</p>
+    </div>
 
-    <label for="psw"><b style="color:rgb(255, 255, 255);">Password</b></label>
-    <input type="password" placeholder="Enter Password" name="psw" required>
-        
-    <button type="submit"><b style="color:rgb(255, 255, 255);">Login</b></button>
-    <label><input type="checkbox" checked="checked" name="remember"><b style="color:rgb(255, 255, 255);">Remember Me?</b></label>
-  </div>
-
-  <div class="container" style="background-color:rgb(25, 25, 25);">
-    <button type="button" class="cancelbtn"><b style="color:rgb(255, 255, 255);">Cancel</b></button>
-    <span class="psw"><a href="#"><b style="color:rgb(255, 255, 255);">Forgot password?</b></a></span>
-  </div>
-</form>
-
+    <footer class="max-w-lg mx-auto flex justify-center text-white">
+        <a href="#" class="hover:underline">Contact</a>
+        <span class="mx-3">•</span>
+        <a href="#" class="hover:underline">Privacy</a>
+    </footer>
 </body>
 </html>
