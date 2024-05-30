@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="h-[80vh] flex flex-col items-center justify-center mt-5">
+    <h1 class="text-8xl lg:text-[9.5rem] font-black text-[{{ base['color'] }}]">
+        404.
+    </h1>
+    <h1 class="text-xl lg:text-2xl font-medium text-white -mt-7 sm:mt-2 md:mt-2">
+        {{ error_message }}
+    </h1>
+    <h1 class="text-xs lg:text-sm font-light text-gray-400">
+        {{ secondary_error_message }}
+    </h1>
+</div>
+{% endblock content %}
