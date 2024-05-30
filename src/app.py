@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from random import randint
 
 from flask import Flask, request, render_template, redirect, url_for, session, flash
-from flask import Flask, render_template, request
 from humanize import naturaldate
 
 from database import populate_rooms_on_day, schedule_booking
@@ -126,6 +125,7 @@ def availability():
         bookings=bookings
     )
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -142,10 +142,8 @@ def login():
 
 @app.route('/confirmation')
 def confirmation():
-    if 'email' in session:
-        return render_template('confirmation.html')
-    else:
-        return render_template('login.html')
+    source = request.args.get('source', 'default')
+    return render_template('confirmation.html', source=source)
 
 
 @app.route("/confirm_booking")
