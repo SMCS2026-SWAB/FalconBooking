@@ -39,14 +39,6 @@ base_rooms = [
 ]
 ongoing_bookings = {}
 
-app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Required for session management
-
-# Dummy user data
-users = {
-    'user@example.com': 'password123'
-}
-
 
 def _prefix_of_day(day):
     """Helper function to determine the prefix of the day"""
@@ -147,11 +139,6 @@ def login():
             flash('Invalid email or password', 'danger')
     
     return render_template('login.html')
-
-
-@app.route('/forgotYourPassword')
-def forgot_password():
-    return render_template('forgotYourPassword.html')
 
 @app.route('/confirmation')
 def confirmation():
