@@ -2,6 +2,7 @@ from calendar import monthrange
 from datetime import datetime, timedelta
 from random import randint
 
+from flask import Flask, request, render_template, redirect, url_for, session, flash
 from flask import Flask, render_template, request
 from humanize import naturaldate
 
@@ -37,6 +38,14 @@ base_rooms = [
     Room("Room 2900", 7)
 ]
 ongoing_bookings = {}
+
+app = Flask(__name__)
+app.secret_key = 'supersecretkey'  # Required for session management
+
+# Dummy user data
+users = {
+    'user@example.com': 'password123'
+}
 
 
 def _prefix_of_day(day):
@@ -125,21 +134,31 @@ def availability():
         bookings=bookings
     )
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        
+        if email in users and users[email] == password:
+            session['email'] = email
+            return redirect(url_for('confirmation'))
+        else:
+            flash('Invalid email or password', 'danger')
     
-    return render_template(
-        "login.html",
-        base=get_base_params(),
-    )
+    return render_template('login.html')
+
 
 @app.route('/forgotYourPassword')
-def forgotYourPassword():
-    
-    return render_template(
-        "forgotYourPassword.html",
-        base=get_base_params(),
-    )
+def forgot_password():
+    return render_template('forgotYourPassword.html')
+
+@app.route('/confirmation')
+def confirmation():
+    if 'email' in session:
+        return render_template('confirmation.html')
+    else:
+        return render_template('login.html')
 
 
 @app.route("/confirm_booking")

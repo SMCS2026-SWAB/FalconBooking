@@ -27,24 +27,33 @@
         <section>
             <h3 class="font-bold text-2xl">Welcome to Falcon Booking</h3>
             <p class="text-gray-600 pt-2">Log into your account.</p>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul>
+                    {% for category, message in messages %}
+                        <li class="text-red-500">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
         </section>
 
         <section class="mt-10">
-            <form class="flex flex-col" method="POST" action="#">
+            <form class="flex flex-col" method="POST" action="{{ url_for('login') }}">
                 <div class="mb-6 pt-3 rounded bg-gray-200">
                     <label class="block text-gray-700 text-sm font-bold mb-2 ml-3" for="email">Email</label>
-                    <input type="text" placeholder="Enter Email Here" id="email" class="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-yellow-600 transition duration-500 px-3 pb-3">
+                    <input type="text" placeholder="Enter Email Here" id="email" name="email" class="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-yellow-600 transition duration-500 px-3 pb-3">
                 </div>
                 <div class="mb-6 pt-3 rounded bg-gray-200">
                     <label class="block text-gray-700 text-sm font-bold mb-2 ml-3" for="password">Password</label>
-                    <input type="password" placeholder="Enter Password Here" id="password" class="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-yellow-600 transition duration-500 px-3 pb-3">
+                    <input type="password" placeholder="Enter Password Here" id="password" name="password" class="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-yellow-600 transition duration-500 px-3 pb-3">
                 </div>
                 <div class="flex items-center justify-between mb-6">
                     <label class="inline-flex items-center">
                         <input type="checkbox" class="form-checkbox text-yellow-600">
                         <span class="ml-2 text-gray-700">Remember me</span>
                     </label>
-                    <span class="psw"><a href="/forgotYourPassword"><b style="color:rgba(239,174,4,255);">Forgot your password?</b></a></span>
+                    <span class="psw"><a href="{{ url_for('forgot_password') }}"><b style="color:rgba(239,174,4,255);">Forgot your password?</b></a></span>
                 </div>
                 <button class="bg-yellow-600 hover:bg-yellow-400 text-white font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200" type="submit">Login</button>
             </form>
