@@ -23,7 +23,7 @@
                 </button>
             </div>
             <div class="flex flex-col mt-10 w-[70vw]">
-                <h1 class="font-black text-4xl text-[{{ base['color'] }}]">Bookings {{ label_for_day }}</h1>
+                <h1 class="font-black text-4xl text-[{{ base['color'] }}]">Bookings <span class="text-white">{{ label_for_day }}</span></h1>
                 <div class="flex flex-col gap-5">
                     {% for row in bookings %}
                         <div class="flex flex-row gap-10">
