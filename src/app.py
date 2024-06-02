@@ -1,11 +1,15 @@
+import base64
+import uuid
 from calendar import monthrange
 from datetime import datetime, timedelta
+from os import environ
 from random import randint
+from re import sub
 
 from flask import Flask, request, render_template, redirect, url_for, session, flash
 from humanize import naturaldate
 
-from database import populate_rooms_on_day, schedule_booking
+from database import client, populate_rooms_on_day, schedule_booking
 from utils import Room, send_email
 
 FULL_URL = "http://127.0.0.1:3000"
@@ -37,6 +41,19 @@ base_rooms = [
     Room("Room 2900", 7)
 ]
 ongoing_bookings = {}
+
+# Configure the Flask app
+app.config["SECRET_KEY"] = environ.get("FLASK_HASH")
+app.config["SESSION_PERMANENT"] = True
+app.config["SESSION_TYPE"] = "mongodb"
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+app.config["SESSION_COOKIE_NAME"] = "wxathome"
+app.config["SESSION_MONGODB"] = client
+app.config["SESSION_MONGODB_DB"] = "wxathome"
+app.config["SESSION_MONGODB_COLLECTION"] = "sessions"
+
+ongoing_logins = {}
 
 
 def _prefix_of_day(day):
@@ -130,20 +147,30 @@ def availability():
 def login():
     if request.method == 'POST':
         email = request.form['email']
-        password = request.form['password']
         
-        if email in users and users[email] == password:
+        if any(char.isalpha() for char in email.split("@")[0]):
             session['email'] = email
-            return redirect(url_for('confirmation'))
+            hash_generated = base64.urlsafe_b64encode(uuid.uuid4().bytes).decode("utf-8").replace("=", "")
+
+            name_splitted = email.split("@")[0].split(".")
+            full_name = sub(r"[0-9]", "", name_splitted[0].capitalize()) + "_" + sub(r"[0-9]", "", name_splitted[-1].capitalize())
+
+            ongoing_logins[(hash_generated, full_name)] = {
+                "name": full_name.replace("_", " "),
+                "email": email
+            }
+
+            return redirect(url_for('confirmation', hash=hash_generated, name=full_name))
         else:
-            flash('Invalid email or password', 'danger')
+            flash('Invalid email', 'danger')
     
-    return render_template('login.html')
+    return render_template('login.html', base=get_base_params())
 
 @app.route('/confirmation')
 def confirmation():
-    source = request.args.get('source', 'default')
-    return render_template('confirmation.html', source=source)
+    hash_requested = request.args["hash"]
+    name = request.args["name"]
+    if (ongoing_logins.get((hash_requested, name)) is None)
 
 
 @app.route("/confirm_booking")

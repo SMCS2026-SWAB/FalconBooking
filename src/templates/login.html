@@ -7,9 +7,11 @@
     <meta name="author" content="David Grzyb">
     <meta name="description" content="">
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <style>
         .body-bg {
             background-color: #0d1117;
@@ -19,17 +21,17 @@
         }
     </style>
 </head>
-<body class="body-bg min-h-screen pt-12 md:pt-20 pb-6 px-2 md:px-0" style="font-family:'Lato',sans-serif;">
+<body class="body-bg mt-[20vh] pt-12 md:pt-20 pb-6 px-2 md:px-0" style="font-family:Inter;">
     <header class="max-w-lg mx-auto">
         <a href="/">
-            <h1 class="text-4xl font-bold text-center"><b style="color:rgba(239,174,4,255);">Falcon</b><span class="text-white">Booking</span></h1>
+            <h1 class="text-4xl font-medium text-center"><span class="text-[#efae04] font-bold">Falcon</span><span class="text-white">Booking</span></h1>
         </a>
     </header>
 
-    <main class="bg-white max-w-lg mx-auto p-8 md:p-12 my-10 rounded-lg shadow-2xl login-bg">
+    <main class="bg-gray-800 max-w-lg mx-auto p-8 md:p-12 my-7 rounded-xl shadow-2xl">
         <section>
             <h3 class="font-bold text-2xl text-white">Welcome to Falcon Booking</h3>
-            <p class="text-gray-500 pt-2">Log into your account.</p>
+            <p class="text-gray-400 mt-1">Log into your account.</p>
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     <ul>
@@ -41,36 +43,14 @@
             {% endwith %}
         </section>
 
-        <section class="mt-10">
+        <section class="mt-7">
             <form class="flex flex-col" method="POST" action="{{ url_for('login') }}">
                 <div class="mb-6 pt-3 rounded bg-gray-200">
                     <input type="text" placeholder="Email" id="email" name="email" class="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-yellow-600 transition duration-500 px-3 pb-3">
                 </div>
-                <div class="mb-6 pt-3 rounded bg-gray-200">
-                    <input type="password" placeholder="Password" id="password" name="password" class="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-yellow-600 transition duration-500 px-3 pb-3">
-                </div>
-                <div class="flex items-center justify-between mb-6">
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" class="form-checkbox text-yellow-600">
-                        <span class="ml-2 text-gray-500">Remember me</span>
-                    </label>
-                    <span class="psw"><a href="{{ url_for('forgot_password') }}"><b style="color:rgba(239,174,4,255);">Forgot your password?</b></a></span>
-                </div>
-                <button class="bg-yellow-600 hover:bg-yellow-400 text-white font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200" type="submit">Login</button>
+                <button class="bg-[{{ base['color'] }}] hover:bg-yellow-400 text-[#0d1117] font-bold py-2 rounded-lg shadow-lg hover:shadow-xl transition duration-200" type="submit">Login</button>
             </form>
         </section>
     </main>
-    <p class="mt-3 flex justify-center items-center text-center divide-x divide-gray-300 dark:divide-gray-700">
-        <a class="pr-3.5 inline-flex items-center gap-x-2 text-sm text-gray-600 decoration-2 hover:underline hover:text-yellow-600 dark:text-gray-500 dark:hover:text-gray-200" href="#" target="_blank">
-          <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
-          </svg>
-          View Github
-        </a>
-        <a class="pl-3 inline-flex items-center gap-x-2 text-sm text-gray-600 decoration-2 hover:underline hover:text-yellow-600 dark:text-gray-500 dark:hover:text-gray-200" href="#">
-          
-          Contact us!
-        </a>
-      </p>
 </body>
 </html>
