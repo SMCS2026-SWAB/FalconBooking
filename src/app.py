@@ -14,6 +14,8 @@ from humanize import naturaldate
 from database import client, populate_rooms_on_day, schedule_booking
 from utils import Room, send_email
 
+load_dotenv()
+
 FULL_URL = "http://127.0.0.1:3000"
 NUMBER_TO_MONTH = {
     "01": "January",
@@ -30,8 +32,6 @@ NUMBER_TO_MONTH = {
     "12": "December"
 }
 MONTH_TO_NUMBER = dict(zip(NUMBER_TO_MONTH.values(), NUMBER_TO_MONTH.keys()))
-
-load_dotenv()
 
 app = Flask(__name__)
 base_rooms = [
@@ -171,6 +171,18 @@ def login():
                 "name": full_name.replace("_", " "),
                 "email": email
             }
+
+            # Send email to confirm log in.
+            send_email(
+                email, "", "", "", "",
+                subject=f"Finish logging in, {full_name.replace('_', ' ')}",
+                full_text=(
+                    f"Follow the link provided to finish logging into FalconBooking (do not share this link with anyone!):"
+                    f" {FULL_URL}/confirmation?hash={hash_generated}&name={full_name}"
+                )
+            )
+
+            return redirect(url_for("check_email", email=email.split("@")[0]))
         else:
             flash('Invalid email', 'danger')
     
@@ -232,7 +244,7 @@ def process_booking():
 
 @app.route("/check_email")
 def check_email():
-    return render_template("check_email.html", base=get_base_params())
+    return render_template("check_email.html", email=request.args.get("email"), base=get_base_params())
 
 
 if __name__ == "__main__":
