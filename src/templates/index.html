@@ -1,68 +1,79 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="flex flex-col mt-10">
-    <h1 class="font-black text-4xl text-[{{ base['color'] }}]">Bookings {{ label_for_day }}</h1>
-
-    <div class="flex flex-col gap-5">
-        {% for row in bookings %}
-            <div class="flex flex-row gap-10">
-                {% for name, room in row.items() %}
-                    <div class="flex flex-col p-8 bg-gray-800 rounded-lg mt-5 w-full">
-                        <h2 class="font-extrabold text-xl text-white">
-                            {{ name }}
-                        </h2>
-                        {% if room.bookings.availability == 100 %}
-                            <h2 class="font-semibold text-lg text-rose-400">
-                                Booked out
-                            </h2>
-                        {% elif room.bookings.availability > 50 %}
-                            <h2 class="font-semibold text-lg text-rose-400">
-                                Mostly booked out
-                            </h2>
-                        {% elif room.bookings.availability > 0 %}
-                            <h2 class="font-semibold text-lg text-green-400">
-                                Mostly available
-                            </h2>
-                        {% else %}
-                            <h2 class="font-semibold text-lg text-green-400">
-                                Fully available
-                            </h2>
-                        {% endif %}
-
-                        {% if room.bookings.availability == 100 %}
-                            <button class="bg-gray-400/[0.1] outline outline-gray-400 outline-2 rounded-lg py-2 px-4 mt-4 font-medium text-gray-400 text-sm hover:bg-gray-400/[0.2]" disabled>
-                                → Check Availability
-                            </button>
-                        {% else %}
-                            <button class="bg-[{{ base['color'] }}]/[0.1] outline outline-[{{ base['color'] }}] outline-2 rounded-lg py-2 px-4 mt-4 font-medium text-[{{ base['color'] }}] text-sm hover:bg-[{{ base['color'] }}]/[0.2]">
-                                <a href="/availability?id={{ room.id_ }}">→ Check Availability</a>
-                            </button>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endfor %}
-    </div>
-
-    <h1 class="font-black text-4xl text-[{{ base['color'] }}] mt-10">
-        Calendar
-    </h1>
-
-    <div class="flex flex-row gap-4 mt-5">
-        {% for label, link in days_in_calendar %}
-            <div class="flex flex-col items-start justify-start bg-gray-800 rounded-lg p-12 relative">
-                <div class="flex flex-row items-start justify-start absolute top-0 left-0 gap-1.5 mt-2 ml-2">
-                    <div class="w-4 h-4 bg-rose-500{{'' if availability_by_day[loop.index - 1] <= 25 else '/[0.2]'}} rounded-xl"></div>
-                    <div class="w-4 h-4 bg-yellow-500{{'' if availability_by_day[loop.index - 1] > 25 and availability_by_day[loop.index - 1] < 75 else '/[0.2]'}} rounded-xl"></div>
-                    <div class="w-4 h-4 bg-green-500{{'' if availability_by_day[loop.index - 1] >= 75 else '/[0.2]'}} rounded-xl"></div>
+    <div class="flex flex-col items-center justify-center mt-10 gap-2 w-full h-[80vh]">
+        <div class="flex flex-col items-start justify-center">
+            <h1 class="font-bold text-3xl text-[{{ base['color'] }}]">Select a date</h1>
+            <div class="flex flex-col mt-3">
+                <div class="relative max-w-sm">
+                  <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                    </svg>
+                  </div>
+                  <input datepicker type="text" id="datePicker" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 pr-20 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[{{ base['color'] }}] dark:focus:border-[{{ base['color'] }}]" placeholder="Select date">
                 </div>
-                <h1 class="font-extrabold text-2xl text-white">{{ label }}</h1>
-                <button class="bg-[{{ base['color'] }}]/[0.1] outline outline-[{{ base['color'] }}] outline-2 rounded-lg py-2 px-3 mt-4 font-medium text-[{{ base['color'] }}] text-sm hover:bg-[{{ base['color'] }}]/[0.2]">
-                    <a href="/?date={{ link }}">→ Check Bookings</a>
+                <button class="bg-[{{ base['color'] }}]/[0.1] outline outline-[{{ base['color'] }}] outline-2 rounded-lg py-2.5 px-4 mt-3 font-medium text-[{{ base['color'] }}] text-sm hover:bg-[{{ base['color'] }}]/[0.2] w-full" onclick="reloadPage()">
+                    <div class="flex flex-row gap-2 items-center justify-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="-ml-1 size-5 text-[{{ base['color'] }}]">
+                          <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+                        </svg>
+                        <p>Check date</p>
+                    </div>
                 </button>
             </div>
-        {% endfor %}
+            <div class="flex flex-col mt-10 w-[70vw]">
+                <h1 class="font-black text-4xl text-[{{ base['color'] }}]">Bookings <span class="text-white">{{ label_for_day }}</span></h1>
+                <div class="flex flex-col gap-5">
+                    {% for row in bookings %}
+                        <div class="flex flex-row gap-10">
+                            {% for name, room in row.items() %}
+                                <div class="flex flex-col p-8 bg-gray-800 rounded-lg mt-5 w-full">
+                                    <h2 class="font-extrabold text-xl text-white">
+                                        {{ name }}
+                                    </h2>
+                                    {% if room.bookings.availability == 100 %}
+                                        <h2 class="font-semibold text-lg text-rose-400">
+                                            Booked out
+                                        </h2>
+                                    {% elif room.bookings.availability > 50 %}
+                                        <h2 class="font-semibold text-lg text-rose-400">
+                                            Mostly booked out
+                                        </h2>
+                                    {% elif room.bookings.availability > 0 %}
+                                        <h2 class="font-semibold text-lg text-green-400">
+                                            Mostly available
+                                        </h2>
+                                    {% else %}
+                                        <h2 class="font-semibold text-lg text-green-400">
+                                            Fully available
+                                        </h2>
+                                    {% endif %}
+
+                                    {% if room.bookings.availability == 100 %}
+                                        <button class="bg-gray-400/[0.1] outline outline-gray-400 outline-2 rounded-lg py-2 px-4 mt-4 font-medium text-gray-400 text-xs lg:text-sm hover:bg-gray-400/[0.2]" disabled>
+                                            → Check Availability
+                                        </button>
+                                    {% else %}
+                                        <button class="bg-[{{ base['color'] }}]/[0.1] outline outline-[{{ base['color'] }}] outline-2 rounded-lg py-2 px-4 mt-4 font-medium text-[{{ base['color'] }}] text-sm hover:bg-[{{ base['color'] }}]/[0.2]">
+                                            <a href="/availability?id={{ room.id_ }}&date={{ date }}">→ Check Availability</a>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+    <script>
+        document.getElementById("datePicker").value = "{{ date }}";
+        function reloadPage() {
+            const dateSelected = document.getElementById("datePicker").value;
+            setTimeout(function() {
+                location.href = "/?date=" + dateSelected;
+            }, 250);
+        }
+    </script>
 {% endblock content %}

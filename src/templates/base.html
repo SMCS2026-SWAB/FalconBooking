@@ -11,7 +11,32 @@
     <meta http-equiv="Expires" content="-1" />
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://unpkg.com/flowbite@1.5.2/dist/flowbite.min.css" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            "50":"#d69c04b3",
+                            "100":"#d69c04b3",
+                            "200":"#d69c04b3",
+                            "300":"#d69c04b3",
+                            "400":"#d69c04b3",
+                            "500":"#d69c04b3",
+                            "600":"#d69c04b3",
+                            "700":"#d69c04b3",
+                            "800":"#d69c04b3",
+                            "900":"#d69c04b3",
+                            "950":"#d69c04b3"
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/datepicker.min.js"></script>
 </head>
 
@@ -35,16 +60,16 @@
             </button>
             <div class="hidden w-full md:block md:w-auto" id="navbar-default">
                 <ul
-                    class="flex flex-col p-4 mt-4 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:text-md md:font-medium md:border-0">
+                    class="flex flex-col items-center justify-center p-4 mt-4 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:text-md md:font-medium md:border-0">
                     <li>
                         <a href="/"
                             class="mt-2 block py-2 pr-4 pl-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-[#efae04] md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent text-md"
-                            aria-current="page"><span class="">Home</span></a>
+                            aria-current="page"><span class="">Overview</span></a>
                     </li>
                     <li>
                         <a href="{{ url_for('availability') }}"
                             class="mt-2 block py-2 pr-4 pl-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-[#efae04] md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent text-md"
-                            aria-current="page"><span class="">Availability</span></a>
+                            aria-current="page"><span class="">Book Rooms</span></a>
                     </li>
                     {% if not base["isLoggedIn"] %}
                         <li>
@@ -59,8 +84,7 @@
             </div>
         </div>
     </nav>
-
-    <div class="h-100 w-[93%] flex items-left justify-left font-sans ml-[7%]">
+    <div class="h-full flex items-center justify-center font-sans">
         {% block content %}
 
         {% endblock content %}

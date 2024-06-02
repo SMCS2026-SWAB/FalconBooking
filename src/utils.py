@@ -1,3 +1,14 @@
+import smtplib
+import ssl
+from datetime import datetime
+from email.mime.text import MIMEText
+from os import environ
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 class Booking:
     """Represents a single booking made by a teacher for a study room."""
 
@@ -13,17 +24,18 @@ class Booking:
         "Lunch"
     }
 
-    def __init__(self, periods_free: list):
-        self.periods_free = periods_free
-        self.periods_unavailable = list(self.AVAILABLE_PERIODS.difference(periods_free))
+    def __init__(self, periods_booked: list, booked_by: dict):
+        self.periods_unavailable = sorted(periods_booked)
+        self.periods_free = sorted(list(self.AVAILABLE_PERIODS.difference(periods_booked)))
         self._period_summary = [
-            (period, idx < len(periods_free))
-            for idx, period in enumerate(periods_free + self.periods_unavailable)
+            (period, period in self.periods_free)
+            for period in sorted(self.periods_free + self.periods_unavailable)
         ]
         self.windowed_period_summary = [self._period_summary[i:i+3] for i in range(0, 9, 3)]
         self.availability = int(
             (len(self.AVAILABLE_PERIODS) - len(self.periods_free)) / len(self.AVAILABLE_PERIODS) * 100
         )
+        self.booked_by = booked_by
 
     @classmethod
     def timings_for_period(cls) -> dict[str, tuple[str, str]]:
@@ -43,6 +55,26 @@ class Booking:
 class Room:
     """Represents a room's booking for a certain day, with an assigned ID."""
 
-    def __init__(self, booking_list: Booking, id: int):
+    def __init__(self, name: str, id: int, booking_list: Booking = None):
+        self.name = name
         self.bookings = booking_list
         self.id_ = id
+
+    def with_bookings(self, booking_list: Booking) -> "Room":
+        return Room(self.name, self.id_, booking_list)
+
+
+def send_email(email: str, date: str, room: str, block: str, link: str, **kwargs) -> None:
+    parsed_date = datetime.strptime(date, "%m/%d/%Y")
+    email_body = MIMEText(
+        f"You wanted to book {room} during {block} on {parsed_date.strftime('%B %d, %Y')}.\n\n"
+        f"Follow {link} to confirm your booking."
+    )
+    email_body["Subject"] = f"Booking for {room} on {parsed_date.strftime('%B %d')} during {block}"
+    email_body["From"] = "smcs2026.swab@gmail.com"
+    email_body["To"] = email
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login("smcs2026.swab@gmail.com", environ["EMAIL_PASSWORD"])
+        server.sendmail("smcs2026.swab@gmail.com", email, email_body.as_string())

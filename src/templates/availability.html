@@ -2,28 +2,50 @@
 
 {% block content %}
 <div class="flex flex-col mt-5 gap-2">
-    <h1 class="font-extrabold text-2xl text-[{{ base['color'] }}]">Select a room</h1>
-    <li>
-        <button id="dropdownDefault" data-dropdown-toggle="dropdown"
-            class="text-gray-300 focus:ring-4 font-semibold rounded-lg text-md px-10 py-2.5 -ml-6 text-center inline-flex items-center border-2 border-gray-300"
-            type="button">{{ (bookings.keys() | list)[room_id] }}<svg class="ml-2 w-4 h-4" aria-hidden="true" fill="none"
-                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 9l-7 7-7-7"></path>
-            </svg></button>
-        <!-- Dropdown menu -->
-        <div id="dropdown"
-            class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
-            <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
-                {% for name, room in bookings.items() %}
-                <li>
-                    <a href="/availability?id={{ room.id_ }}"
-                       class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">{{ name }}</a>
-                </li>
-                {% endfor %}
-            </ul>
+    <div class="flex flex-row gap-10 items-start">
+        <div class="flex flex-col items-start justify-center">
+            <h1 class="font-extrabold text-2xl text-[{{ base['color'] }}]">Select a room</h1>
+            <li>
+                <button id="dropdownDefault" data-dropdown-toggle="dropdown"
+                    class="text-gray-300 focus:ring-4 font-semibold rounded-lg text-md px-10 py-2 -ml-6 mt-3 text-center inline-flex items-center border border-gray-300"
+                    type="button">{{ (bookings.keys() | list)[room_id] }}<svg class="ml-2 w-4 h-4" aria-hidden="true" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 9l-7 7-7-7"></path>
+                    </svg></button>
+                <!-- Dropdown menu -->
+                <div id="dropdown"
+                    class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
+                    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
+                        {% for name, room in bookings.items() %}
+                        <li>
+                            <a href="/availability?id={{ room.id_ }}&date={{ date }}"
+                               class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">{{ name }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </li>
         </div>
-    </li>
+        <div class="flex flex-col items-start justify-center">
+            <h1 class="font-extrabold text-2xl text-[{{ base['color'] }}]">Select a date</h1>
+            <div class="flex flex-row justify-items items-center mt-3 gap-2">
+                <div class="relative max-w-sm">
+                  <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                    </svg>
+                  </div>
+                  <input datepicker type="text" id="datePicker" class="bg-gray-50 border border-gray-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 pr-20 dark:bg-gray-700 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[{{ base['color'] }}] dark:focus:border-[{{ base['color'] }}]" placeholder="Select date">
+                </div>
+                <button class="bg-[{{ base['color'] }}]/[0.1] border border-[{{ base['color'] }}] rounded-lg py-2.5 px-3 font-medium text-[{{ base['color'] }}] text-sm hover:bg-[{{ base['color'] }}]/[0.2]" onclick="reloadPage()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-[{{ base['color'] }}]">
+                      <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
     <hr class="mt-4 border-1 w-[80vw] border-white/50">
     <h1 class="font-black text-5xl text-[{{ base['color'] }}] mt-5">{{ (bookings.keys() | list)[room_id] }}</h1>
     <h1 class="font-light text-lg text-gray-300 -mt-2">Hosts 30 people</h1>
@@ -39,7 +61,7 @@
                 <h1 class="font-light text-sm text-gray-400 -mt-1">
                     Usually between {{ room_selected.bookings.timings_for_period()[period][0] }} and {{ room_selected.bookings.timings_for_period()[period][1] }}
                 </h1>
-                <button class="bg-[{{ base['color'] }}]/[0.1] outline outline-[{{ base['color'] }}] outline-2 rounded-lg py-2 px-4 mt-3 font-medium text-[{{ base['color'] }}] text-sm hover:bg-[{{ base['color'] }}]/[0.2]">
+                <button class="bg-lime-300/[0.1] outline outline-lime-300 outline-2 rounded-lg py-2 px-4 mt-3 font-medium text-lime-300 text-sm hover:bg-lime-300/[0.2]" onclick="submit_login('{{ room_selected.name }}', '{{ period }}')" data-modal-target="default-modal" data-modal-toggle="default-modal" type="button">
                     → Book Room
                 </button>
             </div>
@@ -51,14 +73,78 @@
                 <h1 class="font-light text-sm text-gray-400 -mt-1">
                     Usually between {{ room_selected.bookings.timings_for_period()[period][0] }} and {{ room_selected.bookings.timings_for_period()[period][1] }}
                 </h1>
-                <h1 class="font-semibold text-md text-rose-500 mt-1">
-                    Booked by Shayaan Wadkar
-                </h1>
+                <div class="bg-rose-300/[0.1] outline outline-rose-300 outline-2 rounded-lg py-2 px-4 mt-3 font-medium text-rose-300 text-sm">
+                    Booked by {{ room_selected.bookings.booked_by[period] }}
+                </div>
             </div>
             {% endif %}
         {% endfor %}
         </div>
     {% endfor %}
     </div>
+    <!-- Main modal -->
+    <div id="default-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full" data-modal-backdrop="static">
+        <div class="relative p-4 w-full max-w-2xl max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        Check your email
+                    </h3>
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" onclick="close_modal()" data-modal-hide="default-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
+                <!-- Modal body -->
+                <div class="p-4 md:p-5 space-y-4">
+                    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                        An email was just sent to <span class="font-bold text-gray-300">{{ base["email"] }}</span> by <span class="font-bold text-gray-300">smcs2026.swab@gmail.com</span>.
+                    </p>
+                    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                    Click on the link provided in the email to confirm your booking.
+                    </p>
+                </div>
+                <!-- Modal footer -->
+                <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                    <button onclick="close_modal()" data-modal-hide="default-modal" type="button" class="text-gray-800 font-bold bg-[{{ base['color'] }}] hover:bg-yellow-300 focus:ring-4 focus:outline-none focus:ring-[{{ base['color'] }}] rounded-lg text-sm px-5 py-2.5 text-center">Thanks.</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<script>
+    document.getElementById("datePicker").value = "{{ date }}";
+    function reloadPage() {
+        const dateSelected = document.getElementById("datePicker").value;
+        setTimeout(function() {
+            location.href = "/availability?id={{ room_selected.id_ }}&date=" + dateSelected;
+        }, 250);
+    }
+
+    function close_modal() {
+        document.querySelector("body > div[modal-backdrop]")?.remove();
+    }
+
+    function submit_login(room, block) {
+        var server_data = {
+            "name": "{{ base['name'] }}",
+            "email": "{{ base['email'] }}",
+            "date": "{{ date }}",
+            "room": room,
+            "block": block
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/process_booking",
+            data: JSON.stringify(server_data),
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+</script>
 {% endblock content %}

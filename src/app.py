@@ -1,11 +1,42 @@
+from calendar import monthrange
 from datetime import datetime, timedelta
-from random import randint, sample
+from random import randint
 
 from flask import Flask, render_template, request
 from humanize import naturaldate
-from utils import Booking, Room
+
+from database import populate_rooms_on_day, schedule_booking
+from utils import Room, send_email
+
+FULL_URL = "http://127.0.0.1:3000"
+NUMBER_TO_MONTH = {
+    "01": "January",
+    "02": "February",
+    "03": "March",
+    "04": "April",
+    "05": "May",
+    "06": "June",
+    "07": "July",
+    "08": "August",
+    "09": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December"
+}
+MONTH_TO_NUMBER = dict(zip(NUMBER_TO_MONTH.values(), NUMBER_TO_MONTH.keys()))
 
 app = Flask(__name__)
+base_rooms = [
+    Room("SMCS Hub", 0),
+    Room("Global Hub", 1),
+    Room("Humanities Hub", 2),
+    Room("ISP Hub", 3),
+    Room("Room 2709", 4),
+    Room("Room 2800", 5),
+    Room("Room 2801", 6),
+    Room("Room 2900", 7)
+]
+ongoing_bookings = {}
 
 
 def _prefix_of_day(day):
@@ -22,15 +53,26 @@ def _prefix_of_day(day):
         return "th"
 
 
+def _truncate_date(year, month, day):
+    """Helper function to truncate dates."""
+    last_day_of_month = monthrange(year, month)[1]
+
+    if day > last_day_of_month:
+        day = last_day_of_month
+
+    return datetime(year, month, day)
+
+
 def get_base_params():
     """Retrieves and updates the base parameters at the moment."""
-    return {"name": "Shayaan Wadkar", "isLoggedIn": False, "color": "#efae04"}
+    return {"name": "Shayaan Wadkar", "email": "shayaanwadkar@gmail.com", "isLoggedIn": True, "color": "#efae04"}
 
 
 @app.route("/")
 def home():
     if date_requested := request.args.get("date"):
-        date_requested = datetime.strptime(date_requested, "%Y-%m-%d")
+        month, day, year = map(int, date_requested.split("/"))
+        date_requested = _truncate_date(year, month, day)
         days_in_calendar = [date_requested + timedelta(days=day) for day in range(6)]
     else:
         days_in_calendar = [datetime.today() + timedelta(days=day) for day in range(6)]
@@ -41,13 +83,16 @@ def home():
         calendar_day = days_in_calendar[0].strftime('%d').lstrip('0')
         label_for_day = f"on {days_in_calendar[0].strftime('%B')} {calendar_day}{_prefix_of_day(calendar_day)}"
 
+    rooms = populate_rooms_on_day(days_in_calendar[0], base_rooms)
+
     return render_template(
         "index.html",
-        base={"name": "Shayaan Wadkar", "isLoggedIn": False, "color": "#efae04"},
+        base=get_base_params(),
+        date=request.args.get("date") or datetime.today().strftime("%m/%d/%Y"),
         days_in_calendar=[
             (
                 " ".join(part.lstrip("0") for part in date.strftime("%B %d").split()),
-                date.strftime("%Y-%m-%d")
+                date.strftime("%m/%d/%Y")
             )
             for date in days_in_calendar
         ],
@@ -55,41 +100,65 @@ def home():
         availability_by_day=[randint(0, 100) for _ in range(6)],
         bookings=[
             {
-                "SMCS Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=1)), 0),
-                "Global Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=3)), 1),
-                "Humanities Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=8)), 2),
-                "ISP Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=5)), 3),
-            },
-            {
-                "Room 2709": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=4)), 4),
-                "Room 2800": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=2)), 5),
-                "Room 2801": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=7)), 6),
-                "Room 2901": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=5)), 7)
+                room.name: room for room in rooms[i:i+4]
             }
-        ]
+            for i in range(0, len(rooms), 4)
+        ],
+        number_to_month=NUMBER_TO_MONTH,
+        month_to_number=MONTH_TO_NUMBER
     )
 
 
 @app.route("/availability")
 def availability():
     room_id = int(request.args.get("id", 0))
-    bookings = {
-        "SMCS Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=1)), 0),
-        "Global Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=3)), 1),
-        "Humanities Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=8)), 2),
-        "ISP Hub": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=5)), 3),
-        "Room 2709": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=4)), 4),
-        "Room 2800": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=2)), 5),
-        "Room 2801": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=7)), 6),
-        "Room 2901": Room(Booking(sample(Booking.AVAILABLE_PERIODS, k=5)), 7)
-    }
+    date = request.args.get("date", datetime.today().strftime("%m/%d/%Y"))
+    rooms = populate_rooms_on_day(datetime.strptime(date, "%m/%d/%Y"), base_rooms)
+    bookings = {room.name: room for room in rooms}
+
     return render_template(
         "availability.html",
         base=get_base_params(),
+        date=date,
         room_id=room_id,
         room_selected=next(room for room in bookings.values() if room.id_ == room_id),
         bookings=bookings
     )
+
+
+@app.route("/confirm_booking")
+def confirm_booking():
+    confirmation_id = int(request.args["id"])
+
+    if (booking_info := ongoing_bookings.get(confirmation_id)) is None:
+        return render_template(
+            "404.html",
+            base=get_base_params(),
+            error_message="This confirmation ID doesn't exist.",
+            secondary_error_message="Are you sure this booking exists? Check your email again."
+        )
+    else:
+        schedule_booking(**booking_info)
+        parsed_date = datetime.strptime(booking_info["date"], "%m/%d/%Y")
+        return render_template(
+            "booking_confirmed.html",
+            base=get_base_params(),
+            block=booking_info["block"],
+            date=f"{parsed_date.strftime('%B')} {parsed_date.day}{_prefix_of_day(str(parsed_date.day))}, {parsed_date.year}",
+            name=booking_info["name"],
+            room=booking_info["room"]
+        )
+
+
+@app.route("/process_booking", methods=["POST"])
+def process_booking():
+    confirmation_id = int(list(ongoing_bookings.keys())[-1]) + 1 if len(ongoing_bookings.keys()) > 0 else 0
+    ongoing_bookings[confirmation_id] = request.get_json()
+    send_email(
+        **request.get_json(),
+        link=FULL_URL + f"/confirm_booking?id={confirmation_id}"
+    )
+    return {"action": "Check your email."}
 
 
 if __name__ == "__main__":
