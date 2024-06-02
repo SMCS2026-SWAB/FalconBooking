@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="h-[80vh] flex flex-col items-center justify-center mt-5">
+    <h1 class="text-5xl font-black text-[{{ base['color'] }}]">
+        Check your email.
+    </h1>
+    <h1 class="text-xl font-medium text-white -mt-7 sm:mt-2 md:mt-2">
+        An email was sent to <span class="font-bold">{{ email }}</span> by <span class="font-bold">smcs2026.swab@gmail.com.</span>
+    </h1>
+    <h1 class="text-xs lg:text-sm font-light text-gray-400">
+        Click on the link in the email to finish logging in.
+    </h1>
+</div>
+{% endblock content %}

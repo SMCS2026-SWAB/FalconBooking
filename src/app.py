@@ -171,8 +171,6 @@ def login():
                 "name": full_name.replace("_", " "),
                 "email": email
             }
-
-            return redirect(url_for('confirmation', hash=hash_generated, name=full_name))
         else:
             flash('Invalid email', 'danger')
     
@@ -230,6 +228,11 @@ def process_booking():
         link=FULL_URL + f"/confirm_booking?id={confirmation_id}"
     )
     return {"action": "Check your email."}
+
+
+@app.route("/check_email")
+def check_email():
+    return render_template("check_email.html", base=get_base_params())
 
 
 if __name__ == "__main__":
