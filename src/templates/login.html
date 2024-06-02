@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="author" content="David Grzyb">
+    <meta name="description" content="">
+
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        .body-bg {
+            background-color: #0d1117;
+        }
+        .login-bg {
+            background-color: rgba(46,55,70,255);
+        }
+    </style>
+</head>
+<body class="body-bg mt-[20vh] pt-12 md:pt-20 pb-6 px-2 md:px-0" style="font-family:Inter;">
+    <header class="max-w-lg mx-auto">
+        <a href="/">
+            <h1 class="text-4xl font-medium text-center"><span class="text-[#efae04] font-bold">Falcon</span><span class="text-white">Booking</span></h1>
+        </a>
+    </header>
+
+    <main class="bg-gray-800 max-w-lg mx-auto p-8 md:p-12 my-7 rounded-xl shadow-2xl">
+        <section>
+            <h3 class="font-bold text-2xl text-white">Welcome to Falcon Booking</h3>
+            <p class="text-gray-400 mt-1">Log into your account.</p>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul>
+                    {% for category, message in messages %}
+                        <li class="text-red-500">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </section>
+
+        <section class="mt-7">
+            <form class="flex flex-col" method="POST" action="{{ url_for('login') }}">
+                <div class="mb-6 pt-3 rounded bg-gray-200">
+                    <input type="text" placeholder="Email" id="email" name="email" class="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-yellow-600 transition duration-500 px-3 pb-3">
+                </div>
+                <button class="bg-[{{ base['color'] }}] hover:bg-yellow-400 text-[#0d1117] font-bold py-2 rounded-lg shadow-lg hover:shadow-xl transition duration-200" type="submit">Login</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

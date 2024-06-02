@@ -1,12 +1,20 @@
+import base64
+import uuid
 from calendar import monthrange
 from datetime import datetime, timedelta
+from os import environ
 from random import randint
+from re import sub
 
-from flask import Flask, render_template, request
+from dotenv import load_dotenv
+from flask import Flask, request, render_template, redirect, url_for, session, flash
+from flask_session import Session
 from humanize import naturaldate
 
-from database import populate_rooms_on_day, schedule_booking
+from database import client, populate_rooms_on_day, schedule_booking
 from utils import Room, send_email
+
+load_dotenv()
 
 FULL_URL = "http://127.0.0.1:3000"
 NUMBER_TO_MONTH = {
@@ -38,6 +46,22 @@ base_rooms = [
 ]
 ongoing_bookings = {}
 
+# Configure the Flask app
+app.config["SECRET_KEY"] = environ.get("FLASK_HASH")
+app.config["SESSION_PERMANENT"] = True
+app.config["SESSION_TYPE"] = "mongodb"
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+app.config["SESSION_COOKIE_NAME"] = "falconbooking"
+app.config["SESSION_MONGODB"] = client
+app.config["SESSION_MONGODB_DB"] = "falconbooking"
+app.config["SESSION_MONGODB_COLLECTION"] = "sessions"
+
+# Start the session to keep the user logged in
+Session(app)
+
+ongoing_logins = {}
+
 
 def _prefix_of_day(day):
     """Helper function to determine the prefix of the day"""
@@ -65,7 +89,12 @@ def _truncate_date(year, month, day):
 
 def get_base_params():
     """Retrieves and updates the base parameters at the moment."""
-    return {"name": "Shayaan Wadkar", "email": "shayaanwadkar@gmail.com", "isLoggedIn": True, "color": "#efae04"}
+    return {
+        "name": session.get("name", "").title(),
+        "email": session.get("email", ""),
+        "isLoggedIn": session.get("logged_in", False),
+        "color": "#efae04"
+    }
 
 
 @app.route("/")
@@ -126,6 +155,58 @@ def availability():
     )
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        
+        if any(char.isalpha() for char in email.split("@")[0]):
+            session['email'] = email
+            hash_generated = base64.urlsafe_b64encode(uuid.uuid4().bytes).decode("utf-8").replace("=", "")
+
+            name_splitted = email.split("@")[0].split(".")
+            full_name = sub(r"[0-9]", "", name_splitted[0].capitalize()) + "_" + sub(r"[0-9]", "", name_splitted[-1].capitalize())
+
+            ongoing_logins[(hash_generated, full_name)] = {
+                "name": full_name.replace("_", " "),
+                "email": email
+            }
+
+            # Send email to confirm log in.
+            send_email(
+                email, "", "", "", "",
+                subject=f"Finish logging in, {full_name.replace('_', ' ')}",
+                full_text=(
+                    f"Follow the link provided to finish logging into FalconBooking (do not share this link with anyone!):"
+                    f" {FULL_URL}/confirmation?hash={hash_generated}&name={full_name}"
+                )
+            )
+
+            return redirect(url_for("check_email", email=email.split("@")[0]))
+        else:
+            flash('Invalid email', 'danger')
+    
+    return render_template('login.html', base=get_base_params())
+
+
+@app.route('/confirmation')
+def confirmation():
+    hash_requested = request.args["hash"]
+    name = request.args["name"]
+    if (login_info := ongoing_logins.get((hash_requested, name))) is None:
+        return render_template(
+            "404.html",
+            error_message="The login you're trying to confirm doesn't exist.",
+            secondary_error_message="Try logging in again."
+        )
+    else:
+        session["name"] = login_info["name"]
+        session["email"] = login_info["email"]
+        session["logged_in"] = True
+
+        return redirect(url_for("home"))
+
+
 @app.route("/confirm_booking")
 def confirm_booking():
     confirmation_id = int(request.args["id"])
@@ -159,6 +240,11 @@ def process_booking():
         link=FULL_URL + f"/confirm_booking?id={confirmation_id}"
     )
     return {"action": "Check your email."}
+
+
+@app.route("/check_email")
+def check_email():
+    return render_template("check_email.html", email=request.args.get("email"), base=get_base_params())
 
 
 if __name__ == "__main__":

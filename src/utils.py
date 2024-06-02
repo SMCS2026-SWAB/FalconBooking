@@ -64,15 +64,21 @@ class Room:
         return Room(self.name, self.id_, booking_list)
 
 
-def send_email(email: str, date: str, room: str, block: str, link: str, **kwargs) -> None:
-    parsed_date = datetime.strptime(date, "%m/%d/%Y")
-    email_body = MIMEText(
-        f"You wanted to book {room} during {block} on {parsed_date.strftime('%B %d, %Y')}.\n\n"
-        f"Follow {link} to confirm your booking."
-    )
-    email_body["Subject"] = f"Booking for {room} on {parsed_date.strftime('%B %d')} during {block}"
-    email_body["From"] = "smcs2026.swab@gmail.com"
-    email_body["To"] = email
+def send_email(email: str, date: str, room: str, block: str, link: str, subject: str = None, full_text: str = None, **kwargs) -> None:
+    if full_text is None:
+        parsed_date = datetime.strptime(date, "%m/%d/%Y")
+        email_body = MIMEText(
+            f"You wanted to book {room} during {block} on {parsed_date.strftime('%B %d, %Y')}.\n\n"
+            f"Follow {link} to confirm your booking."
+        )
+        email_body["Subject"] = f"Booking for {room} on {parsed_date.strftime('%B %d')} during {block}"
+        email_body["From"] = "smcs2026.swab@gmail.com"
+        email_body["To"] = email
+    else:
+        email_body = MIMEText(full_text)
+        email_body["Subject"] = subject
+        email_body["From"] = "smcs2026.swab@gmail.com"
+        email_body["To"] = email
 
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
