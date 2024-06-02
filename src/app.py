@@ -6,7 +6,9 @@ from os import environ
 from random import randint
 from re import sub
 
+from dotenv import load_dotenv
 from flask import Flask, request, render_template, redirect, url_for, session, flash
+from flask_session import Session
 from humanize import naturaldate
 
 from database import client, populate_rooms_on_day, schedule_booking
@@ -29,6 +31,8 @@ NUMBER_TO_MONTH = {
 }
 MONTH_TO_NUMBER = dict(zip(NUMBER_TO_MONTH.values(), NUMBER_TO_MONTH.keys()))
 
+load_dotenv()
+
 app = Flask(__name__)
 base_rooms = [
     Room("SMCS Hub", 0),
@@ -48,10 +52,13 @@ app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "mongodb"
 app.config["SESSION_COOKIE_SECURE"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "None"
-app.config["SESSION_COOKIE_NAME"] = "wxathome"
+app.config["SESSION_COOKIE_NAME"] = "falconbooking"
 app.config["SESSION_MONGODB"] = client
-app.config["SESSION_MONGODB_DB"] = "wxathome"
+app.config["SESSION_MONGODB_DB"] = "falconbooking"
 app.config["SESSION_MONGODB_COLLECTION"] = "sessions"
+
+# Start the session to keep the user logged in
+Session(app)
 
 ongoing_logins = {}
 
@@ -82,7 +89,12 @@ def _truncate_date(year, month, day):
 
 def get_base_params():
     """Retrieves and updates the base parameters at the moment."""
-    return {"name": "Shayaan Wadkar", "email": "shayaanwadkar@gmail.com", "isLoggedIn": True, "color": "#efae04"}
+    return {
+        "name": session.get("name", "").title(),
+        "email": session.get("email", ""),
+        "isLoggedIn": session.get("logged_in", False),
+        "color": "#efae04"
+    }
 
 
 @app.route("/")
@@ -170,7 +182,8 @@ def login():
 def confirmation():
     hash_requested = request.args["hash"]
     name = request.args["name"]
-    if (ongoing_logins.get((hash_requested, name)) is None)
+    if (ongoing_logins.get((hash_requested, name)) is None):
+        return render_template()
 
 
 @app.route("/confirm_booking")
