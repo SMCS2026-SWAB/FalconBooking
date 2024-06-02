@@ -189,6 +189,15 @@ def login():
     return render_template('login.html', base=get_base_params())
 
 
+@app.route("/logout")
+def logout():
+    session["name"] = ""
+    session["logged_in"] = False
+    session["email"] = ""
+
+    return redirect(url_for("home"))
+
+
 @app.route('/confirmation')
 def confirmation():
     hash_requested = request.args["hash"]
