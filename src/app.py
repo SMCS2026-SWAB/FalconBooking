@@ -178,12 +178,23 @@ def login():
     
     return render_template('login.html', base=get_base_params())
 
+
 @app.route('/confirmation')
 def confirmation():
     hash_requested = request.args["hash"]
     name = request.args["name"]
-    if (ongoing_logins.get((hash_requested, name)) is None):
-        return render_template()
+    if (login_info := ongoing_logins.get((hash_requested, name))) is None:
+        return render_template(
+            "404.html",
+            error_message="The login you're trying to confirm doesn't exist.",
+            secondary_error_message="Try logging in again."
+        )
+    else:
+        session["name"] = login_info["name"]
+        session["email"] = login_info["email"]
+        session["logged_in"] = True
+
+        return redirect(url_for("home"))
 
 
 @app.route("/confirm_booking")
