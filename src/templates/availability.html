@@ -61,9 +61,11 @@
                 <h1 class="font-light text-sm text-gray-400 -mt-1">
                     Usually between {{ room_selected.bookings.timings_for_period()[period][0] }} and {{ room_selected.bookings.timings_for_period()[period][1] }}
                 </h1>
+                {% if base["isLoggedIn"] %}
                 <button class="bg-lime-300/[0.1] outline outline-lime-300 outline-2 rounded-lg py-2 px-4 mt-3 font-medium text-lime-300 text-sm hover:bg-lime-300/[0.2]" onclick="submit_login('{{ room_selected.name }}', '{{ period }}')" data-modal-target="default-modal" data-modal-toggle="default-modal" type="button">
                     → Book Room
                 </button>
+                {% endif %}
             </div>
             {% else %}
             <div class="flex flex-col items-start justify-center bg-rose-500/[0.025] outline outline-2 outline-rose-500/75 rounded-lg p-4 mt-2 w-1/2">
