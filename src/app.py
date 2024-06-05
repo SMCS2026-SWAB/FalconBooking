@@ -38,11 +38,11 @@ base_rooms = [
     Room("SMCS Hub", 0),
     Room("Global Hub", 1),
     Room("Humanities Hub", 2),
-    Room("ISP Hub", 3),
-    Room("Room 2709", 4),
-    Room("Room 2800", 5),
-    Room("Room 2801", 6),
-    Room("Room 2900", 7)
+    Room("ISP Hub (Nest)", 3),
+    Room("SMCS Collab Rm.", 4),
+    Room("Global Collab Rm.", 5),
+    Room("Hum. Collab Rm.", 6),
+    Room("ISP Collab Rm.", 7)
 ]
 ongoing_bookings = {}
 
