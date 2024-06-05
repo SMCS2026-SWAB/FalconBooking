@@ -28,6 +28,12 @@ def schedule_booking(date: str, block: str, room: str, name: str, **kwargs) -> N
     )
 
 
+def remove_database_booking(query: dict) -> None:
+    """Removes a booking from the MongoDB database."""
+    bookings = db["bookings"]
+    bookings.remove(query)
+
+
 def serialize_booking_for_room(date: datetime, room: str) -> Booking:
     """Serializes the bookings from the database for a specific room into their respective class."""
     bookings = db["bookings"]

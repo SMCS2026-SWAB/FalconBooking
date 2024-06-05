@@ -68,7 +68,7 @@
                 {% endif %}
             </div>
             {% else %}
-            <div class="flex flex-col items-start justify-center bg-rose-500/[0.025] outline outline-2 outline-rose-500/75 rounded-lg p-4 mt-2 w-1/2">
+            <div class="relative flex flex-col items-start justify-center bg-rose-500/[0.025] outline outline-2 outline-rose-500/75 rounded-lg p-4 mt-2 w-1/2">
                 <h1 class="font-extrabold text-lg text-white">
                     {{ period }}
                 </h1>
@@ -78,6 +78,13 @@
                 <div class="bg-rose-300/[0.1] outline outline-rose-300 outline-2 rounded-lg py-2 px-4 mt-3 font-medium text-rose-300 text-sm">
                     Booked by {{ room_selected.bookings.booked_by[period] }}
                 </div>
+                {% if room_selected.bookings.booked_by[period] == base["name"] %}
+                <button class="bg-transparent" onclick="remove_booking('{{ period }}', '{{ room_selected.name }}', '{{ date }}', '{{ base['name'] }}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="absolute top-0 right-0 mt-2 mr-2 size-6 text-gray-300 hover:text-white">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                {% endif %}
             </div>
             {% endif %}
         {% endfor %}
@@ -146,6 +153,27 @@
             data: JSON.stringify(server_data),
             contentType: "application/json",
             dataType: 'json'
+        });
+    }
+
+    function remove_booking(block, room, date, name) {
+        var server_data = {
+            "name": name,
+            "date": date,
+            "room": room,
+            "block": block
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/remove_booking",
+            data: JSON.stringify(server_data),
+            contentType: "application/json",
+            dataType: "json",
+            success: function (result) {
+                alert(result["action"])
+                location.reload();
+            }
         });
     }
 </script>

@@ -11,7 +11,7 @@ from flask import Flask, request, render_template, redirect, url_for, session, f
 from flask_session import Session
 from humanize import naturaldate
 
-from database import client, populate_rooms_on_day, schedule_booking
+from database import client, populate_rooms_on_day, remove_database_booking, schedule_booking
 from utils import Room, send_email
 
 load_dotenv()
@@ -238,6 +238,13 @@ def confirm_booking():
             name=booking_info["name"],
             room=booking_info["room"]
         )
+
+
+@app.route("/remove_booking", methods=["POST"])
+def remove_booking():
+    data = request.get_json()
+    remove_database_booking(data)
+    return {"action": f"Your booking for {data['room']} on {data['date']} during {data['block']} has been removed."}
 
 
 @app.route("/process_booking", methods=["POST"])
