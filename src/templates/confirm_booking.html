@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="h-[80vh] flex flex-col gap-7 items-center justify-center">
+    <div class="flex flex-row gap-10 items-center justify-start">
+        <div class="flex flex-col gap-2 items-start justify-start">
+            <h1 class="font-black text-[{{ base['color'] }}] text-4xl">
+                Details of your booking
+            </h1>
+            <div class="flex flex-row gap-2 items-center justify-start bg-gray-800 py-3 px-7 rounded-lg w-full mt-2 transition ease-in-out delay-50d hover:scale-x-110 hover:bg-gray-600 duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-8 text-white/75">
+                  <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+                </svg>
+                <p class="text-lg text-white/[0.9] font-extralight">Booked by <span class="font-bold">{{ name }}</span></p>
+            </div>
+            <div class="flex flex-row gap-2 items-center justify-start bg-gray-800 py-3 px-7 rounded-lg w-full transition ease-in-out delay-50 hover:scale-x-110 hover:bg-gray-600 duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-8 text-white/75">
+                  <path fill-rule="evenodd" d="M6.75 2.25A.75.75 0 0 1 7.5 3v1.5h9V3A.75.75 0 0 1 18 3v1.5h.75a3 3 0 0 1 3 3v11.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V7.5a3 3 0 0 1 3-3H6V3a.75.75 0 0 1 .75-.75Zm13.5 9a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5Z" clip-rule="evenodd" />
+                </svg>
+                <p class="text-lg text-white/[0.9] font-extralight">Booked for <span class="font-bold">{{ formatted_date }}</span></p>
+            </div>
+            <div class="flex flex-row gap-2 items-center justify-start bg-gray-800 py-3 px-7 rounded-lg w-full transition ease-in-out delay-50 hover:scale-x-110 hover:bg-gray-600 duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-8 text-white/75">
+                  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
+                </svg>
+                <p class="text-lg text-white/[0.9] font-extralight">Booked during <span class="font-bold">{{ block }}</span></p>
+            </div>
+            <div class="flex flex-row gap-2 items-center justify-start bg-gray-800 py-3 px-7 rounded-lg w-full transition ease-in-out delay-50 hover:scale-x-110 hover:bg-gray-600 duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-8 text-white/75">
+                  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+                </svg>
+                <p class="text-lg text-white/[0.9] font-extralight">Booked for <span class="font-bold">{{ room }}</span></p>
+            </div>
+        </div>
+        <div class="flex flex-col gap-2 items-start justify-start">
+            <h1 class="font-black text-[{{ base['color'] }}] text-4xl">
+                Additional features
+            </h1>
+            <h1 class="text-white text-xs mt-2">
+                How often do you want to repeat this booking?
+            </h1>
+            <li>
+                <button id="dropdownDefault" data-dropdown-toggle="dropdown"
+                    class="text-gray-300 focus:ring-4 font-semibold rounded-lg text-md px-10 py-2 -ml-6 text-center inline-flex items-center border border-gray-300"
+                    type="button">{{ repeat_time }}<svg class="ml-2 w-4 h-4" aria-hidden="true" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 9l-7 7-7-7"></path>
+                    </svg></button>
+                <!-- Dropdown menu -->
+                <div id="dropdown"
+                    class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
+                    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
+                        <li>
+                            <a href="/confirm_booking?id={{ id }}&repeat=never"
+                               class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Never</a>
+                        </li>
+                        <li>
+                            <a href="/confirm_booking?id={{ id }}&repeat=daily"
+                               class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Daily</a>
+                        </li>
+                        <li>
+                            <a href="/confirm_booking?id={{ id }}&repeat=weekly"
+                               class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Weekly</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </div>
+    </div>
+    <button class="bg-[{{ base['color'] }}] hover:bg-yellow-400 font-bold text-[#0D1117] rounded-lg px-4 py-3 w-full" onclick="create_booking()">
+        Confirm my booking
+    </button>
+</div>
+<script>
+    function create_booking() {
+        var server_data = {
+            "name": "{{ base['name'] }}",
+            "email": "{{ base['email'] }}",
+            "date": "{{ raw_date }}",
+            "room": "{{ room }}",
+            "block": "{{ block }}",
+            "repeat": "{{ repeat_time }}"
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/create_booking",
+            data: JSON.stringify(server_data),
+            contentType: "application/json",
+            dataType: 'json',
+            success: function(result) {
+                location.href = result["link"];
+            }
+        });
+    }
+</script>
+{% endblock content %}

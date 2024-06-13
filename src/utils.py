@@ -24,7 +24,7 @@ class Booking:
         "Lunch"
     }
 
-    def __init__(self, periods_booked: list, booked_by: dict):
+    def __init__(self, periods_booked: list, booked_by: dict, recurring: dict, ids: dict):
         self.periods_unavailable = sorted(periods_booked)
         self.periods_free = sorted(list(self.AVAILABLE_PERIODS.difference(periods_booked)))
         self._period_summary = [
@@ -36,6 +36,8 @@ class Booking:
             (len(self.AVAILABLE_PERIODS) - len(self.periods_free)) / len(self.AVAILABLE_PERIODS) * 100
         )
         self.booked_by = booked_by
+        self.recurring = recurring
+        self.ids = ids
 
     @classmethod
     def timings_for_period(cls) -> dict[str, tuple[str, str]]:

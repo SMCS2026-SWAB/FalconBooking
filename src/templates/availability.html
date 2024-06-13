@@ -62,7 +62,7 @@
                     Usually between {{ room_selected.bookings.timings_for_period()[period][0] }} and {{ room_selected.bookings.timings_for_period()[period][1] }}
                 </h1>
                 {% if base["isLoggedIn"] %}
-                <button class="bg-lime-300/[0.1] outline outline-lime-300 outline-2 rounded-lg py-2 px-4 mt-3 font-medium text-lime-300 text-sm hover:bg-lime-300/[0.2]" onclick="submit_login('{{ room_selected.name }}', '{{ period }}')" data-modal-target="default-modal" data-modal-toggle="default-modal" type="button">
+                <button class="bg-lime-300/[0.1] outline outline-lime-300 outline-2 rounded-lg py-2 px-4 mt-3 font-medium text-lime-300 text-sm hover:bg-lime-300/[0.2]" onclick="process_booking('{{ room_selected.name }}', '{{ period }}')">
                     → Book Room
                 </button>
                 {% endif %}
@@ -79,11 +79,19 @@
                     Booked by {{ room_selected.bookings.booked_by[period] }}
                 </div>
                 {% if room_selected.bookings.booked_by[period] == base["name"] %}
-                <button class="bg-transparent" onclick="remove_booking('{{ period }}', '{{ room_selected.name }}', '{{ date }}', '{{ base['name'] }}')">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="absolute top-0 right-0 mt-2 mr-2 size-6 text-gray-300 hover:text-white">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                </button>
+                    {% if room_selected.bookings.recurring[period] != "Never" %}
+                    <button class="bg-transparent" onclick="location.href = '/cancel_booking?room={{ room_selected.name }}&block={{ period }}&name={{ base['name'] }}&date={{ date }}&id={{ room_selected.bookings.ids[period] }}'">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="absolute top-0 right-0 mt-2 mr-2 size-6 text-gray-300 hover:text-white">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    {% else %}
+                    <button class="bg-transparent" onclick="remove_booking('{{ period }}', '{{ room_selected.name }}', '{{ date }}', '{{ base['name'] }}', '{{ room_selected.bookings.ids[period] }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="absolute top-0 right-0 mt-2 mr-2 size-6 text-gray-300 hover:text-white">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    {% endif %}
                 {% endif %}
             </div>
             {% endif %}
@@ -91,42 +99,10 @@
         </div>
     {% endfor %}
     </div>
-    <!-- Main modal -->
-    <div id="default-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full" data-modal-backdrop="static">
-        <div class="relative p-4 w-full max-w-2xl max-h-full">
-            <!-- Modal content -->
-            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                <!-- Modal header -->
-                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                        Check your email
-                    </h3>
-                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" onclick="close_modal()" data-modal-hide="default-modal">
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                        </svg>
-                        <span class="sr-only">Close modal</span>
-                    </button>
-                </div>
-                <!-- Modal body -->
-                <div class="p-4 md:p-5 space-y-4">
-                    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                        An email was just sent to <span class="font-bold text-gray-300">{{ base["email"] }}</span> by <span class="font-bold text-gray-300">smcs2026.swab@gmail.com</span>.
-                    </p>
-                    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                    Click on the link provided in the email to confirm your booking.
-                    </p>
-                </div>
-                <!-- Modal footer -->
-                <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-                    <button onclick="close_modal()" data-modal-hide="default-modal" type="button" class="text-gray-800 font-bold bg-[{{ base['color'] }}] hover:bg-yellow-300 focus:ring-4 focus:outline-none focus:ring-[{{ base['color'] }}] rounded-lg text-sm px-5 py-2.5 text-center">Thanks.</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 <script>
     document.getElementById("datePicker").value = "{{ date }}";
+
     function reloadPage() {
         const dateSelected = document.getElementById("datePicker").value;
         setTimeout(function() {
@@ -138,7 +114,7 @@
         document.querySelector("body > div[modal-backdrop]")?.remove();
     }
 
-    function submit_login(room, block) {
+    function process_booking(room, block) {
         var server_data = {
             "name": "{{ base['name'] }}",
             "email": "{{ base['email'] }}",
@@ -152,16 +128,21 @@
             url: "/process_booking",
             data: JSON.stringify(server_data),
             contentType: "application/json",
-            dataType: 'json'
+            dataType: 'json',
+            success: function(result) {
+                location.href = "/confirm_booking?id=" + result["id"];
+            }
         });
     }
 
-    function remove_booking(block, room, date, name) {
+    function remove_booking(block, room, date, name, id) {
         var server_data = {
             "name": name,
             "date": date,
             "room": room,
-            "block": block
+            "block": block,
+            "id": id,
+            "purge_all_bookings": true
         };
 
         $.ajax({
@@ -171,7 +152,7 @@
             contentType: "application/json",
             dataType: "json",
             success: function (result) {
-                alert(result["action"])
+                alert("Your booking has been removed.");
                 location.reload();
             }
         });

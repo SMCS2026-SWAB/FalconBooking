@@ -1,3 +1,4 @@
+import atexit
 import base64
 import uuid
 from calendar import monthrange
@@ -6,12 +7,13 @@ from os import environ
 from random import randint
 from re import sub
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 from flask import Flask, request, render_template, redirect, url_for, session, flash
 from flask_session import Session
 from humanize import naturaldate
 
-from database import client, populate_rooms_on_day, remove_database_booking, schedule_booking
+from database import client, exclude_day_from_booking, populate_rooms_on_day, remove_database_booking, remove_database_bookings_before_day, schedule_booking
 from utils import Room, send_email
 
 load_dotenv()
@@ -85,6 +87,12 @@ def _truncate_date(year, month, day):
         day = last_day_of_month
 
     return datetime(year, month, day)
+
+
+def _clear_database_bookings():
+    """Clears database bookings for the previous day to keep the MongoDB queries quick."""
+    date_today = datetime.today()
+    remove_database_bookings_before_day(date_today)
 
 
 def get_base_params():
@@ -228,34 +236,57 @@ def confirm_booking():
             secondary_error_message="Are you sure this booking exists? Check your email again."
         )
     else:
-        schedule_booking(**booking_info)
         parsed_date = datetime.strptime(booking_info["date"], "%m/%d/%Y")
         return render_template(
-            "booking_confirmed.html",
+            "confirm_booking.html",
             base=get_base_params(),
+            id=confirmation_id,
             block=booking_info["block"],
-            date=f"{parsed_date.strftime('%B')} {parsed_date.day}{_prefix_of_day(str(parsed_date.day))}, {parsed_date.year}",
+            raw_date=booking_info["date"],
+            formatted_date=f"{parsed_date.strftime('%B')} {parsed_date.day}{_prefix_of_day(str(parsed_date.day))}, {parsed_date.year}",
             name=booking_info["name"],
-            room=booking_info["room"]
+            room=booking_info["room"],
+            repeat_time=request.args.get("repeat", "Never").capitalize()
         )
+
+
+@app.route("/cancel_booking")
+def cancel_booking():
+    return render_template(
+        "cancel_booking.html",
+        base=get_base_params(),
+        block=request.args.get("block"),
+        room=request.args.get("room"),
+        date=request.args.get("date"),
+        name=request.args.get("name"),
+        id=request.args.get("id")
+    )
+
+
+@app.route("/create_booking", methods=["POST"])
+def create_booking():
+    data = request.get_json()
+    schedule_booking(**data)
+    return {"link": f"/availability?id={next(room for room in base_rooms if room.name == data['room']).id_}&date={data['date']}"}
 
 
 @app.route("/remove_booking", methods=["POST"])
 def remove_booking():
     data = request.get_json()
-    remove_database_booking(data)
-    return {"action": f"Your booking for {data['room']} on {data['date']} during {data['block']} has been removed."}
+
+    if data.get("purge_all_bookings", False):
+        remove_database_booking(data["id"])
+    else:
+        exclude_day_from_booking(data["id"], data["date"])
+
+    return {"link": f"/availability?id={next(room for room in base_rooms if room.name == data['room']).id_}&date={data['date']}"}
 
 
 @app.route("/process_booking", methods=["POST"])
 def process_booking():
     confirmation_id = int(list(ongoing_bookings.keys())[-1]) + 1 if len(ongoing_bookings.keys()) > 0 else 0
     ongoing_bookings[confirmation_id] = request.get_json()
-    send_email(
-        **request.get_json(),
-        link=FULL_URL + f"/confirm_booking?id={confirmation_id}"
-    )
-    return {"action": "Check your email."}
+    return {"id": confirmation_id}
 
 
 @app.route("/check_email")
@@ -264,4 +295,10 @@ def check_email():
 
 
 if __name__ == "__main__":
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=_clear_database_bookings, trigger="interval", seconds=60 * 60 * 24)
+    scheduler.start()
+
     app.run(debug=True, port=3000)
+
+    atexit.register(lambda: scheduler.shutdown())

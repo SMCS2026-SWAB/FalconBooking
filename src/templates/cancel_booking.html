@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="h-[80vh] flex flex-col gap-1 items-center justify-center">
+    <h1 class="font-extrabold text-[{{ base['color'] }}] text-4xl">
+        Cancel your recurring booking
+    </h1>
+    <button class="bg-[{{ base['color'] }}]/[0.1] focus:bg-[{{ base['color'] }}] outline outline-[{{ base['color'] }}] outline-2 rounded-lg w-full py-6 m-4 font-semibold text-lg text-[{{ base['color'] }}] focus:text-[#0D1117]" onclick="setState(false)">
+        Cancel only the booking on {{ date.removeprefix("0") }}
+    </button>
+    <button class="bg-[{{ base['color'] }}]/[0.1] focus:bg-[{{ base['color'] }}] outline outline-[{{ base['color'] }}] outline-2 rounded-lg w-full py-6 font-semibold text-lg text-[{{ base['color'] }}] focus:text-[#0D1117]" onclick="setState(true)">
+        Cancel all recurring bookings
+    </button>
+    <button class="bg-gray-400/[0.1] outline outline-gray-400 outline-2 font-bold text-gray-300 rounded-lg px-4 py-3 mt-6 w-full hover:bg-gray-400/25" onclick="removeBooking()">
+        Cancel the booking
+    </button>
+</div>
+<script>
+    var purge_all_bookings = false;
+
+    function setState(newState) {
+        purge_all_bookings = newState;
+    }
+
+    function removeBooking() {
+        var server_data = {
+            "name": "{{ base['name'] }}",
+            "email": "{{ base['email'] }}",
+            "date": "{{ date }}",
+            "room": "{{ room }}",
+            "block": "{{ block }}",
+            "id": "{{ id }}",
+            "purge_all_bookings": purge_all_bookings
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/remove_booking",
+            data: JSON.stringify(server_data),
+            contentType: "application/json",
+            dataType: 'json',
+            success: function(result) {
+                location.href = result["link"];
+            }
+        });
+    }
+</script>
+{% endblock content %}
