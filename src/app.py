@@ -18,7 +18,7 @@ from utils import Room, send_email
 
 load_dotenv()
 
-FULL_URL = "https://falconbooking.onrender.com/"
+FULL_URL = "https://falconbooking.onrender.com"
 NUMBER_TO_MONTH = {
     "01": "January",
     "02": "February",
