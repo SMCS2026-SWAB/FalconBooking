@@ -5,3 +5,4 @@ humanize==1.1.0
 pymongo==3.10.0
 python-dotenv==0.21.0
 gunicorn==23.0.0
+Werkzeug==3.0.4
