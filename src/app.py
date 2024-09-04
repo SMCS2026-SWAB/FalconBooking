@@ -18,7 +18,7 @@ from utils import Room, send_email
 
 load_dotenv()
 
-FULL_URL = "http://127.0.0.1:3000"
+FULL_URL = "https://falconbooking.onrender.com/"
 NUMBER_TO_MONTH = {
     "01": "January",
     "02": "February",
@@ -168,7 +168,7 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         
-        if any(char.isalpha() for char in email.split("@")[0]) and "mcpsmd.net" == email.split("@")[-1]:
+        if any(char.isalpha() for char in email.split("@")[0]):
             session['email'] = email
             hash_generated = base64.urlsafe_b64encode(uuid.uuid4().bytes).decode("utf-8").replace("=", "")
 
