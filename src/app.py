@@ -168,7 +168,7 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         
-        if any(char.isalpha() for char in email.split("@")[0]):
+        if any(char.isalpha() for char in email.split("@")[0]) and email.split("@")[-1] == "mcpsmd.net":
             session['email'] = email
             hash_generated = base64.urlsafe_b64encode(uuid.uuid4().bytes).decode("utf-8").replace("=", "")
 
