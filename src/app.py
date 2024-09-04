@@ -37,14 +37,14 @@ MONTH_TO_NUMBER = dict(zip(NUMBER_TO_MONTH.values(), NUMBER_TO_MONTH.keys()))
 
 app = Flask(__name__)
 base_rooms = [
-    Room("SMCS Hub", 0),
-    Room("Global Hub", 1),
-    Room("Humanities Hub", 2),
-    Room("ISP Hub (Nest)", 3),
-    Room("SMCS Collab Rm.", 4),
-    Room("Global Collab Rm.", 5),
-    Room("Hum. Collab Rm.", 6),
-    Room("ISP Collab Rm.", 7)
+    Room("SMCS Hub", 0, capacity=30),
+    Room("Global Hub", 1, capacity=30),
+    Room("Humanities Hub", 2, capacity=30),
+    Room("ISP Hub (Nest)", 3, capacity=30),
+    Room("SMCS Collab Rm.", 4, capacity=10),
+    Room("Global Collab Rm.", 5, capacity=10),
+    Room("Hum. Collab Rm.", 6, capacity=10),
+    Room("ISP Collab Rm.", 7, capacity=10)
 ]
 ongoing_bookings = {}
 

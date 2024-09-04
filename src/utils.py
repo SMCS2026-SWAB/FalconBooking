@@ -57,13 +57,14 @@ class Booking:
 class Room:
     """Represents a room's booking for a certain day, with an assigned ID."""
 
-    def __init__(self, name: str, id: int, booking_list: Booking = None):
+    def __init__(self, name: str, id: int, booking_list: Booking = None, *,  capacity: int):
         self.name = name
         self.bookings = booking_list
+        self.capacity = capacity
         self.id_ = id
 
     def with_bookings(self, booking_list: Booking) -> "Room":
-        return Room(self.name, self.id_, booking_list)
+        return Room(self.name, self.id_, booking_list, capacity=self.capacity)
 
 
 def send_email(email: str, date: str, room: str, block: str, link: str, subject: str = None, full_text: str = None, **kwargs) -> None:

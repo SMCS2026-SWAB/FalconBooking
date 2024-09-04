@@ -48,7 +48,7 @@
     </div>
     <hr class="mt-4 border-1 w-[80vw] border-white/50">
     <h1 class="font-black text-5xl text-[{{ base['color'] }}] mt-5">{{ (bookings.keys() | list)[room_id] }}</h1>
-    <h1 class="font-light text-lg text-gray-300 -mt-2">Hosts 30 people</h1>
+    <h1 class="font-light text-lg text-gray-300 -mt-2">Hosts {{ room_selected.capacity }} people</h1>
     <div class="h-[50vh]">
     {% for window in room_selected.bookings.windowed_period_summary %}
         <div class="flex flex-row gap-12 h-1/3 p-4">
