@@ -1,8 +1,8 @@
 APScheduler==3.10.4
-Flask==2.2.2
+Flask==3.0.3
 Flask-Session==0.8.0
 humanize==1.1.0
 pymongo==3.10.0
 python-dotenv==0.21.0
 gunicorn==23.0.0
-Werkzeug==3.0.4
+Werkzeug==3.0.3
