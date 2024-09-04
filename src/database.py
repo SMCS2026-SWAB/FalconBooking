@@ -43,7 +43,7 @@ def exclude_day_from_booking(entry_id: str, date: str) -> None:
 def remove_database_booking(entry_id: str) -> None:
     """Removes a booking from the MongoDB database."""
     bookings = db["bookings"]
-    bookings.remove({"_id": ObjectId(entry_id)})
+    bookings.delete_one({"_id": ObjectId(entry_id)})
 
 
 def remove_database_bookings_before_day(day: datetime) -> None:
