@@ -13,7 +13,7 @@ client = MongoClient(environ["MONGODB_URI"])
 db = client["falconbooking"]
 
 
-def schedule_booking(date: str, block: str, room: str, name: str, repeat: str, **kwargs) -> None:
+def schedule_booking(date: str, block: str, room: str, name: str, repeat: str, end_date: str, **kwargs) -> None:
     """Schedules a booking for the assigned date and block for a designated room assigned to a name."""
     bookings = db["bookings"]
 
@@ -27,6 +27,7 @@ def schedule_booking(date: str, block: str, room: str, name: str, repeat: str, *
             "room": room,
             "name": name,
             "repeat": repeat,
+            "end_date": end_date,
             "exclude": []
         }
     )
@@ -62,8 +63,11 @@ def serialize_booking_for_room(date: datetime, room: str) -> Booking:
 
     # Serialize bookings for normal bookings, daily repeats and weekly repeats
     for booking in all_bookings:
-        parsed_date = datetime.strptime(booking["date"], "%m/%d/%Y")
-        calendar_year_to_stop = parsed_date.year + 1 if 8 <= parsed_date.month <= 12 else parsed_date.year
+        calendar_year_to_stop = datetime.today().year + 1 if 8 <= datetime.today().month <= 12 else datetime.today().year
+        default_end_date = datetime(year=calendar_year_to_stop, month=7, day=1)
+
+        # Temporary solution until every booking has an end date.
+        end_date = datetime.strptime(booking.get("end_date", default_end_date.strftime('%m/%d/%Y')), "%m/%d/%Y")
 
         if booking["date"] == formatted_date and booking["room"] == room and formatted_date not in booking["exclude"]:
             room_bookings.append(booking)
@@ -72,7 +76,7 @@ def serialize_booking_for_room(date: datetime, room: str) -> Booking:
             and booking["room"] == room
             and formatted_date not in booking["exclude"]
             and booking not in room_bookings
-            and date < datetime(year=calendar_year_to_stop, month=7, day=1)
+            and date <= end_date
         ):
             room_bookings.append(booking)
         elif (
@@ -81,7 +85,7 @@ def serialize_booking_for_room(date: datetime, room: str) -> Booking:
             and (date - datetime.strptime(booking["date"], "%m/%d/%Y")).days % 7 == 0
             and formatted_date not in booking["exclude"]
             and booking not in room_bookings
-            and date < datetime(year=calendar_year_to_stop, month=7, day=1)
+            and date <= end_date
         ):
             room_bookings.append(booking)
 

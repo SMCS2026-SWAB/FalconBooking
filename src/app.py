@@ -168,7 +168,7 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         
-        if any(char.isalpha() for char in email.split("@")[0]) and email.split("@")[-1] == "mcpsmd.net":
+        if any(char.isalpha() for char in email.split("@")[0]) and "mcpsmd.net" == email.split("@")[-1]:
             session['email'] = email
             hash_generated = base64.urlsafe_b64encode(uuid.uuid4().bytes).decode("utf-8").replace("=", "")
 
@@ -246,7 +246,8 @@ def confirm_booking():
             formatted_date=f"{parsed_date.strftime('%B')} {parsed_date.day}{_prefix_of_day(str(parsed_date.day))}, {parsed_date.year}",
             name=booking_info["name"],
             room=booking_info["room"],
-            repeat_time=request.args.get("repeat", "Never").capitalize()
+            repeat_time=request.args.get("repeat", "Never").capitalize(),
+            end_date=request.args.get("date", datetime.today().strftime('%m/%d/%Y'))
         )
 
 
