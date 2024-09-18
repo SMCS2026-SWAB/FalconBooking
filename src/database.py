@@ -33,6 +33,14 @@ def schedule_booking(date: str, block: str, room: str, name: str, repeat: str, e
     )
 
 
+def add_one_to_visits() -> None:
+    visits = db["visits"]
+    document_id = "66eabb5e906ced1769247f71"
+
+    visit_count = visits.find_one({"_id": ObjectId(document_id)})["visits"] + 1
+    visits.update_one({"_id": ObjectId(document_id)}, {"$set": {"visits": visit_count}})
+
+
 def exclude_day_from_booking(entry_id: str, date: str) -> None:
     bookings = db["bookings"]
     booking_in_db = bookings.find_one({"_id": ObjectId(entry_id)})

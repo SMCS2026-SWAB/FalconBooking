@@ -13,7 +13,7 @@ from flask import Flask, request, render_template, redirect, url_for, session, f
 from flask_session import Session
 from humanize import naturaldate
 
-from database import client, exclude_day_from_booking, populate_rooms_on_day, remove_database_booking, remove_database_bookings_before_day, schedule_booking
+from database import client, add_one_to_visits, exclude_day_from_booking, populate_rooms_on_day, remove_database_booking, remove_database_bookings_before_day, schedule_booking
 from utils import Room, send_email
 
 load_dotenv()
@@ -107,6 +107,8 @@ def get_base_params():
 
 @app.route("/")
 def home():
+    add_one_to_visits()
+
     if date_requested := request.args.get("date"):
         month, day, year = map(int, date_requested.split("/"))
         date_requested = _truncate_date(year, month, day)
